@@ -82,10 +82,10 @@ app.use((req, res) => {
   });
 });
 
-// Start Server locally if run directly
+// Start Server
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`FitPulse Gym Management server running on http://localhost:${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`FitPulse Gym Management server running on port ${PORT}`);
   });
 }
 
