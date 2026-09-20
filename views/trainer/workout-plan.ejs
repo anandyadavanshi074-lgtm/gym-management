@@ -1,0 +1,114 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Manage Workout Plans</h1>
+    <p class="page-subtitle">Add and review workout routines for your assigned athletes</p>
+  </div>
+  <a href="/trainer/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+  <!-- Workout Plan Creator Form -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-plus-circle"></i> Add Workout Routine</h3>
+    </div>
+    <form action="/trainer/workout-plan" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="memberId">Select Member</label>
+        <select name="memberId" id="memberId" class="form-control" required onchange="filterByMember(this.value)">
+          <option value="">-- Choose Member --</option>
+          <% assignedMembers.forEach(m => { %>
+            <option value="<%= m._id %>" <%= selectedMemberId === m._id.toString() ? 'selected' : '' %>>
+              <%= m.name %> (<%= m.email %>)
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="dayOfWeek">Day of the Week</label>
+        <select name="dayOfWeek" id="dayOfWeek" class="form-control" required>
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+          <option value="Sunday">Sunday</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="exercise">Exercise Name</label>
+        <input type="text" name="exercise" id="exercise" class="form-control" placeholder="e.g. Bench Press, Squats, Pull Ups" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="sets">Sets</label>
+          <input type="number" name="sets" id="sets" class="form-control" placeholder="e.g. 3" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reps">Reps</label>
+          <input type="text" name="reps" id="reps" class="form-control" placeholder="e.g. 12 or 10-12" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-save"></i> Save Workout Plan
+      </button>
+    </form>
+  </div>
+
+  <!-- Existing Workout Plans for Member/Trainer -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-list"></i> Scheduled Workouts</h3>
+    </div>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Day</th>
+            <th>Exercise</th>
+            <th>Sets &times; Reps</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (workoutPlans && workoutPlans.length > 0) { %>
+            <% workoutPlans.forEach(wp => { %>
+              <tr>
+                <td><strong><%= wp.memberId ? wp.memberId.name : 'N/A' %></strong></td>
+                <td><span class="badge badge-neutral"><%= wp.dayOfWeek %></span></td>
+                <td><strong><%= wp.exercise %></strong></td>
+                <td><%= wp.sets %> sets &times; <%= wp.reps %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                No workout plans found. Select a member and add exercises!
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function filterByMember(memberId) {
+    if (memberId) {
+      window.location.href = '/trainer/workout-plan?memberId=' + memberId;
+    } else {
+      window.location.href = '/trainer/workout-plan';
+    }
+  }
+</script>
+
+<%- include('../partials/footer') %>

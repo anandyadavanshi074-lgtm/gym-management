@@ -1,0 +1,19 @@
+{
+  "name": "gym-management",
+  "version": "1.0.0",
+  "description": "Gym Membership & Workout Plan Management System MVP",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "mongoose": "^8.4.1"
+  }
+}

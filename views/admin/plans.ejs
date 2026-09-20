@@ -1,0 +1,73 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Membership Plans</h1>
+    <p class="page-subtitle">Create and manage gym membership pricing tiers</p>
+  </div>
+  <a href="/admin/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+  <!-- Create Plan Form -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-plus-circle"></i> Create New Plan</h3>
+    </div>
+    <form action="/admin/plans" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="name">Plan Name</label>
+        <input type="text" name="name" id="name" class="form-control" placeholder="e.g. Basic / Standard / VIP" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="duration">Duration (in Days)</label>
+        <input type="number" name="duration" id="duration" class="form-control" placeholder="e.g. 30, 90, 180, 365" min="1" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="price">Price (₹ INR)</label>
+        <input type="number" name="price" id="price" class="form-control" placeholder="e.g. 999" min="0" step="0.01" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-check"></i> Save Plan
+      </button>
+    </form>
+  </div>
+
+  <!-- Existing Plans List -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-list-check"></i> Available Plans</h3>
+    </div>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Duration</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (plans && plans.length > 0) { %>
+            <% plans.forEach(plan => { %>
+              <tr>
+                <td><strong><%= plan.name %></strong></td>
+                <td><%= plan.duration %> Days</td>
+                <td><span style="font-weight: 700; color: var(--primary);">₹<%= plan.price %></span></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="3" style="text-align: center; color: var(--text-muted);">No plans created yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

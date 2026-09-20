@@ -1,0 +1,55 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">My Weekly Workout Routine</h1>
+    <p class="page-subtitle">Personalized training split customized by your coach</p>
+  </div>
+  <a href="/member/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<% if (workoutPlans && workoutPlans.length > 0) { %>
+  <div class="workout-grid">
+    <% daysOrder.forEach(day => { %>
+      <div class="workout-day-card">
+        <div class="day-title">
+          <i class="fa-regular fa-calendar"></i> <%= day %>
+          <% if (groupedWorkouts[day].length > 0) { %>
+            <span class="badge badge-active" style="float: right; font-size: 0.7rem;">
+              <%= groupedWorkouts[day].length %> <%= groupedWorkouts[day].length === 1 ? 'Exercise' : 'Exercises' %>
+            </span>
+          <% } else { %>
+            <span class="badge badge-neutral" style="float: right; font-size: 0.7rem;">Rest</span>
+          <% } %>
+        </div>
+
+        <% if (groupedWorkouts[day].length > 0) { %>
+          <% groupedWorkouts[day].forEach(ex => { %>
+            <div class="workout-item">
+              <div>
+                <strong><%= ex.exercise %></strong>
+              </div>
+              <div style="font-weight: 600; color: var(--primary); font-size: 0.88rem;">
+                <%= ex.sets %> &times; <%= ex.reps %>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">
+            No exercises scheduled (Rest & Recovery).
+          </div>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+<% } else { %>
+  <div class="card" style="text-align: center; padding: 3rem 1.5rem;">
+    <i class="fa-solid fa-clipboard-question" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+    <h3>No Workout Plan Assigned Yet</h3>
+    <p style="color: var(--text-muted); margin-top: 0.5rem; max-width: 450px; margin-left: auto; margin-right: auto;">
+      Your assigned trainer will design your weekly exercise regimen. Please check back soon or consult your trainer.
+    </p>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

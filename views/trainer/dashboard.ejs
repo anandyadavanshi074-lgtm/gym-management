@@ -1,0 +1,102 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Trainer Dashboard</h1>
+    <p class="page-subtitle">Manage assigned members and design customized workout routines</p>
+  </div>
+  <a href="/trainer/workout-plan" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create Workout Plan</a>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Assigned Members</div>
+    <div class="stat-value"><%= assignedCount %></div>
+    <div class="stat-desc">Athletes training under your guidance</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Workout Plans Created</div>
+    <div class="stat-value" style="color: var(--secondary);"><%= workoutPlansCount %></div>
+    <div class="stat-desc">Total exercise schedules set up</div>
+  </div>
+</div>
+
+<!-- Assigned Members List -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fa-solid fa-users"></i> Your Assigned Members</h3>
+  </div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Member Name</th>
+          <th>Email</th>
+          <th>Joined On</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (assignedMembers && assignedMembers.length > 0) { %>
+          <% assignedMembers.forEach(m => { %>
+            <tr>
+              <td><strong><%= m.name %></strong></td>
+              <td><%= m.email %></td>
+              <td><%= new Date(m.createdAt).toLocaleDateString() %></td>
+              <td>
+                <a href="/trainer/workout-plan?memberId=<%= m._id %>" class="btn btn-primary btn-sm">
+                  <i class="fa-solid fa-dumbbell"></i> Manage Workouts
+                </a>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+              No members currently assigned to you by Admin.
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Recent Workout Schedules Created -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fa-solid fa-clipboard-check"></i> Recent Workout Schedules Created</h3>
+  </div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>Day</th>
+          <th>Exercise</th>
+          <th>Sets & Reps</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (workoutPlans && workoutPlans.length > 0) { %>
+          <% workoutPlans.slice(0, 8).forEach(wp => { %>
+            <tr>
+              <td><strong><%= wp.memberId ? wp.memberId.name : 'Unknown' %></strong></td>
+              <td><span class="badge badge-neutral"><%= wp.dayOfWeek %></span></td>
+              <td><%= wp.exercise %></td>
+              <td><%= wp.sets %> sets &times; <%= wp.reps %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--text-muted);">No workout plans created yet.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

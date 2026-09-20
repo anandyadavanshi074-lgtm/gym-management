@@ -1,0 +1,161 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Welcome back, <%= user.name %>!</h1>
+    <p class="page-subtitle">Track your membership status, today's workout, and daily progress</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <a href="/member/workout" class="btn btn-primary"><i class="fa-solid fa-dumbbell"></i> Weekly Routine</a>
+    <a href="/member/weight" class="btn btn-secondary"><i class="fa-solid fa-weight-scale"></i> Weight Log</a>
+  </div>
+</div>
+
+<!-- Overview Stats Cards -->
+<div class="stats-grid">
+  <!-- Membership Status Card -->
+  <div class="stat-card">
+    <div class="stat-label">Membership Status</div>
+    <div style="margin: 0.5rem 0;">
+      <% if (membershipStatus === 'ACTIVE') { %>
+        <span class="badge badge-active" style="font-size: 0.95rem;">Active</span>
+      <% } else if (membershipStatus === 'EXPIRING SOON') { %>
+        <span class="badge badge-expiring" style="font-size: 0.95rem;">Expiring Soon</span>
+      <% } else if (membershipStatus === 'EXPIRED') { %>
+        <span class="badge badge-expired" style="font-size: 0.95rem;">Expired</span>
+      <% } else { %>
+        <span class="badge badge-neutral" style="font-size: 0.95rem;">No Plan</span>
+      <% } %>
+    </div>
+    <div class="stat-desc">
+      <% if (membership && membership.planId) { %>
+        <%= membership.planId.name %> Plan
+      <% } else { %>
+        Contact Admin to enroll
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Expiry Date Card -->
+  <div class="stat-card">
+    <div class="stat-label">Expiry Date</div>
+    <div class="stat-value" style="font-size: 1.4rem; color: var(--text-main);">
+      <% if (membership && membership.expiryDate) { %>
+        <%= new Date(membership.expiryDate).toLocaleDateString() %>
+      <% } else { %>
+        N/A
+      <% } %>
+    </div>
+    <div class="stat-desc">
+      <% if (membershipStatus !== 'EXPIRED' && membershipStatus !== 'NO PLAN') { %>
+        <%= daysRemaining %> days remaining
+      <% } else if (membershipStatus === 'EXPIRED') { %>
+        Membership has expired
+      <% } else { %>
+        No active expiration
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Assigned Trainer Card -->
+  <div class="stat-card">
+    <div class="stat-label">Assigned Trainer</div>
+    <div class="stat-value" style="font-size: 1.4rem; color: var(--primary);">
+      <% if (trainer) { %>
+        <%= trainer.name %>
+      <% } else { %>
+        <span style="font-size: 1.1rem; color: var(--text-muted);">None Assigned</span>
+      <% } %>
+    </div>
+    <div class="stat-desc">
+      <% if (trainer) { %>
+        <%= trainer.email %>
+      <% } else { %>
+        Admin can assign trainer
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Body Weight Card -->
+  <div class="stat-card">
+    <div class="stat-label">Current Weight</div>
+    <div class="stat-value" style="font-size: 1.8rem; color: var(--secondary);">
+      <% if (currentWeight) { %>
+        <%= currentWeight %> <span style="font-size: 1rem; font-weight: 500;">kg</span>
+      <% } else { %>
+        <span style="font-size: 1.1rem; color: var(--text-muted);">No log</span>
+      <% } %>
+    </div>
+    <div class="stat-desc"><a href="/member/weight" style="color: var(--primary); text-decoration: none;">+ Log weight</a></div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+  <!-- Today's Attendance Section -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-calendar-check"></i> Today's Attendance</h3>
+      <span style="font-size: 0.85rem; color: var(--text-muted);"><%= new Date().toDateString() %></span>
+    </div>
+
+    <div style="text-align: center; padding: 1.5rem 0;">
+      <% if (todayAttendance) { %>
+        <div style="color: var(--success); font-size: 3rem; margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h4 style="font-size: 1.25rem; font-weight: 700; color: #065f46; margin-bottom: 0.25rem;">Present Today</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">You have already marked your attendance for today.</p>
+      <% } else { %>
+        <div style="color: var(--warning); font-size: 3rem; margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">Attendance Not Marked</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Check in to record your workout session today.</p>
+        <form action="/member/attendance" method="POST">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-clipboard-user"></i> Mark Today's Attendance
+          </button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Today's Workout Routine -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-dumbbell"></i> Today's Workout (<%= currentDay %>)</h3>
+      <a href="/member/workout" style="font-size: 0.85rem; color: var(--primary); font-weight: 600; text-decoration: none;">View Full Week &rarr;</a>
+    </div>
+
+    <% if (todaysWorkouts && todaysWorkouts.length > 0) { %>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Exercise</th>
+              <th>Sets</th>
+              <th>Reps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% todaysWorkouts.forEach(w => { %>
+              <tr>
+                <td><strong><%= w.exercise %></strong></td>
+                <td><%= w.sets %> sets</td>
+                <td><%= w.reps %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-bed" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--secondary);"></i>
+        <strong>Rest Day or No Exercises Scheduled</strong>
+        <p style="font-size: 0.85rem; margin-top: 0.25rem;">Your trainer hasn't scheduled workouts for <%= currentDay %>.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,181 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Manage Members & Assignments</h1>
+    <p class="page-subtitle">Assign membership plans and personal trainers to members</p>
+  </div>
+  <a href="/admin/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<!-- Forms Section -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <!-- Assign Plan Form -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-file-signature"></i> 1. Assign Membership Plan</h3>
+    </div>
+    <form action="/admin/members/assign-plan" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="memberIdPlan">Select Member</label>
+        <select name="memberId" id="memberIdPlan" class="form-control" required>
+          <option value="">-- Choose Member --</option>
+          <% members.forEach(m => { %>
+            <option value="<%= m._id %>"><%= m.name %> (<%= m.email %>)</option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="planId">Select Plan</label>
+        <select name="planId" id="planId" class="form-control" required>
+          <option value="">-- Choose Plan --</option>
+          <% plans.forEach(p => { %>
+            <option value="<%= p._id %>"><%= p.name %> - <%= p.duration %> Days (₹<%= p.price %>)</option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="startDate">Start Date (Defaults to Today)</label>
+        <input type="date" name="startDate" id="startDate" class="form-control">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-calendar-check"></i> Assign Plan (Auto Expiry)
+      </button>
+    </form>
+  </div>
+
+  <!-- Assign Trainer Form -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-user-ninja"></i> 2. Assign Personal Trainer</h3>
+    </div>
+    <form action="/admin/members/assign-trainer" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="memberIdTrainer">Select Member</label>
+        <select name="memberId" id="memberIdTrainer" class="form-control" required>
+          <option value="">-- Choose Member --</option>
+          <% members.forEach(m => { %>
+            <option value="<%= m._id %>"><%= m.name %> (<%= m.email %>)</option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="trainerId">Select Trainer</label>
+        <select name="trainerId" id="trainerId" class="form-control" required>
+          <option value="">-- Choose Trainer --</option>
+          <% trainers.forEach(t => { %>
+            <option value="<%= t._id %>"><%= t.name %> (<%= t.email %>)</option>
+          <% }) %>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-secondary btn-block" style="margin-top: 2rem;">
+        <i class="fa-solid fa-link"></i> Assign Trainer
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- All Members Table -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fa-solid fa-users"></i> All Members & Membership Status</h3>
+  </div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Member Name</th>
+          <th>Assigned Plan</th>
+          <th>Assigned Trainer</th>
+          <th>Expiry Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (members && members.length > 0) { %>
+          <% members.forEach(m => { %>
+            <tr>
+              <td>
+                <strong><%= m.name %></strong>
+                <div style="font-size: 0.8rem; color: var(--text-muted);"><%= m.email %></div>
+              </td>
+
+              <td>
+                <% if (m.membership && m.membership.planId) { %>
+                  <span style="font-weight: 600; color: var(--primary);">
+                    <%= m.membership.planId.name %>
+                  </span>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">
+                    ₹<%= m.membership.planId.price %> / <%= m.membership.planId.duration %> days
+                  </div>
+                <% } else { %>
+                  <span style="color: var(--text-muted); font-style: italic;">No Plan</span>
+                <% } %>
+              </td>
+
+              <td>
+                <% if (m.membership && m.membership.trainerId) { %>
+                  <span style="font-weight: 500;">
+                    <i class="fa-solid fa-dumbbell" style="color: var(--secondary); font-size: 0.85rem;"></i>
+                    <%= m.membership.trainerId.name %>
+                  </span>
+                <% } else { %>
+                  <span style="color: var(--text-muted); font-style: italic;">Not Assigned</span>
+                <% } %>
+              </td>
+
+              <td>
+                <% if (m.membership && m.membership.expiryDate) { %>
+                  <%= new Date(m.membership.expiryDate).toLocaleDateString() %>
+                  <% if (m.status !== 'EXPIRED') { %>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);"><%= m.daysRemaining %> days left</div>
+                  <% } %>
+                <% } else { %>
+                  &mdash;
+                <% } %>
+              </td>
+
+              <td>
+                <% if (m.status === 'ACTIVE') { %>
+                  <span class="badge badge-active">Active</span>
+                <% } else if (m.status === 'EXPIRING SOON') { %>
+                  <span class="badge badge-expiring">Expiring Soon</span>
+                <% } else if (m.status === 'EXPIRED') { %>
+                  <span class="badge badge-expired">Expired</span>
+                <% } else { %>
+                  <span class="badge badge-neutral">No Plan</span>
+                <% } %>
+              </td>
+
+              <td>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="quickSelectMember('<%= m._id %>')">
+                  Select
+                </button>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted);">No members registered yet.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function quickSelectMember(id) {
+    document.getElementById('memberIdPlan').value = id;
+    document.getElementById('memberIdTrainer').value = id;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+<%- include('../partials/footer') %>

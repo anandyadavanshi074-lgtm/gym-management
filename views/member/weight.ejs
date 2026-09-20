@@ -1,0 +1,131 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Body Weight Tracking</h1>
+    <p class="page-subtitle">Log your weight measurements and monitor fitness progress over time</p>
+  </div>
+  <a href="/member/dashboard" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <!-- Log Weight Form -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-plus-circle"></i> Log Today's Weight</h3>
+    </div>
+    <form action="/member/weight" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="weight">Weight (in kg)</label>
+        <input type="number" step="0.1" name="weight" id="weight" class="form-control" placeholder="e.g. 72.5" min="20" max="300" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="date">Measurement Date</label>
+        <input type="date" name="date" id="date" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-check"></i> Save Weight Entry
+      </button>
+    </form>
+  </div>
+
+  <!-- Chart.js Weight Progress Chart -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-chart-line"></i> Weight Progress</h3>
+    </div>
+    <div style="position: relative; height: 260px; width: 100%;">
+      <canvas id="weightChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Weight History Table -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Weight History Log</h3>
+  </div>
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Weight (kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (weightLogs && weightLogs.length > 0) { %>
+          <% weightLogs.forEach(log => { %>
+            <tr>
+              <td><%= new Date(log.date).toLocaleDateString() %></td>
+              <td><strong style="color: var(--primary); font-size: 1.05rem;"><%= log.weight %> kg</strong></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="2" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+              No weight logs recorded yet. Add your first entry above!
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const labels = <%- chartLabels %>;
+  const dataPoints = <%- chartData %>;
+
+  const ctx = document.getElementById('weightChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Weight (kg)',
+        data: dataPoints,
+        borderColor: '#0f766e',
+        backgroundColor: 'rgba(15, 118, 110, 0.1)',
+        borderWidth: 3,
+        pointBackgroundColor: '#0284c7',
+        pointRadius: 5,
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: 'Weight (kg)'
+          },
+          grid: {
+            color: '#f1f5f9'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Date'
+          },
+          grid: {
+            display: false
+          }
+        }
+      }
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>

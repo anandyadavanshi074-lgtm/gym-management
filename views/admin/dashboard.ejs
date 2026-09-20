@@ -1,0 +1,133 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Admin Dashboard</h1>
+    <p class="page-subtitle">Overview of gym memberships, attendance, and plans</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <a href="/admin/plans" class="btn btn-primary"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+    <a href="/admin/members" class="btn btn-secondary"><i class="fa-solid fa-user-gear"></i> Assign Plan & Trainer</a>
+  </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Total Members</div>
+    <div class="stat-value"><%= stats.totalMembers %></div>
+    <div class="stat-desc">Registered gym members</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Active Members</div>
+    <div class="stat-value" style="color: var(--success);"><%= stats.activeMembers %></div>
+    <div class="stat-desc">Valid active memberships</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Expired Members</div>
+    <div class="stat-value" style="color: var(--danger);"><%= stats.expiredMembers %></div>
+    <div class="stat-desc">Memberships requiring renewal</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Today's Attendance</div>
+    <div class="stat-value" style="color: var(--secondary);"><%= stats.todayAttendance %></div>
+    <div class="stat-desc">Members checked in today</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Total Trainers</div>
+    <div class="stat-value" style="color: #6366f1;"><%= stats.totalTrainers %></div>
+    <div class="stat-desc">Active gym coaches</div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+  <!-- Plan-wise Member Count -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="fa-solid fa-chart-pie"></i> Plan-wise Member Count</h3>
+    </div>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Plan Name</th>
+            <th>Duration</th>
+            <th>Price</th>
+            <th>Enrolled</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (planCounts && planCounts.length > 0) { %>
+            <% planCounts.forEach(p => { %>
+              <tr>
+                <td><strong><%= p.name %></strong></td>
+                <td><%= p.duration %> days</td>
+                <td>₹<%= p.price %></td>
+                <td>
+                  <span class="badge badge-active" style="font-size: 0.85rem;">
+                    <%= p.count %> <%= p.count === 1 ? 'member' : 'members' %>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted);">No plans created yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Expiring Soon Members List -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title" style="color: #b45309;"><i class="fa-solid fa-clock-rotate-left"></i> Expiring Soon Members (Within 7 Days)</h3>
+    </div>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Plan</th>
+            <th>Expiry Date</th>
+            <th>Remaining</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (expiringSoonList && expiringSoonList.length > 0) { %>
+            <% expiringSoonList.forEach(item => { %>
+              <tr>
+                <td>
+                  <strong><%= item.memberName %></strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);"><%= item.memberEmail %></div>
+                </td>
+                <td><%= item.planName %></td>
+                <td><%= item.expiryDate %></td>
+                <td>
+                  <span class="badge badge-expiring">
+                    <%= item.daysRemaining %> <%= item.daysRemaining === 1 ? 'day' : 'days' %> left
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                <i class="fa-solid fa-shield-heart" style="color: var(--success); font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
+                No members expiring in the next 7 days!
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

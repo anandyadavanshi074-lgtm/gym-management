@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+
+<div class="container-narrow">
+  <div class="card">
+    <div class="card-header" style="justify-content: center; flex-direction: column; text-align: center;">
+      <h2 class="card-title" style="font-size: 1.5rem; margin-bottom: 0.25rem;">Create Account</h2>
+      <p class="page-subtitle">Join FitPulse Gym management system</p>
+    </div>
+
+    <form action="/register" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name</label>
+        <input type="text" name="name" id="name" class="form-control" placeholder="John Doe" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" name="email" id="email" class="form-control" placeholder="name@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Create password" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="role">Register as</label>
+        <select name="role" id="role" class="form-control" required>
+          <option value="member" selected>Member</option>
+          <option value="trainer">Trainer</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+        <i class="fa-solid fa-user-plus"></i> Register
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.25rem; font-size: 0.9rem; color: var(--text-muted);">
+      Already have an account? <a href="/login" style="color: var(--primary); font-weight: 600;">Login here</a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
